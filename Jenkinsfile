@@ -21,7 +21,6 @@ pipeline {
    
                     // Create Conda environment
                     sh '$WORKSPACE/miniconda/bin/conda create -y -n chatbot python=3.8'
-                    sh 'source $WORKSPACE/miniconda/bin/activate chatbot'
                 }
             }
         }
@@ -29,7 +28,7 @@ pipeline {
         stage('Update Pip and Setuptools') {
             steps {
                 script {
-                    sh '$WORKSPACE/miniconda/bin/pip install --upgrade pip setuptools'
+                    sh '$WORKSPACE/miniconda/bin/conda run -n chatbot pip install --upgrade pip setuptools'
                 }
             }
         }
@@ -37,9 +36,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Activate Conda environment and install dependencies
-                    sh 'source $WORKSPACE/miniconda/bin/activate chatbot'
-                    sh 'conda install -y --file requirements.txt'
+                    sh '$WORKSPACE/miniconda/bin/conda run -n chatbot pip install -r requirements.txt'
                 }
             }
         }
@@ -47,9 +44,7 @@ pipeline {
         stage('Train Chatbot Model') {
             steps {
                 script {
-                    // Activate Conda environment and train the model
-                    sh 'source $WORKSPACE/miniconda/bin/activate chatbot'
-                    sh 'python train_chatbot_model.py'
+                    sh '$WORKSPACE/miniconda/bin/conda run -n chatbot python train_chatbot_model.py'
                 }
             }
         }
