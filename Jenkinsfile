@@ -17,7 +17,7 @@ pipeline {
                 script {
                     // Install Python and create a virtual environment
                     sh 'python3 -m venv $VIRTUAL_ENV'
-                    sh "source $VIRTUAL_ENV/bin/activate && pip install -U pip"
+                    sh "$VIRTUAL_ENV/bin/pip install -U pip"
                 }
             }
         }
@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     // Activate virtual environment and install dependencies
-                    sh "source $VIRTUAL_ENV/bin/activate && pip install -r requirements.txt"
+                    sh "$VIRTUAL_ENV/bin/pip install -r requirements.txt"
                 }
             }
         }
@@ -50,4 +50,13 @@ pipeline {
         }
     }
     
+    post {
+        always {
+            // Stop the chatbot app
+            sh 'pkill -f "python app.py"'
+            
+            // Deactivate virtual environment
+            sh "$VIRTUAL_ENV/bin/deactivate"
+        }
+    }
 }
