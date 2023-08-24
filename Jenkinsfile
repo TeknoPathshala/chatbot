@@ -12,20 +12,21 @@ pipeline {
             steps {
                 script {
                     // Activate existing Conda environment
-                    sh """
+                    sh '''
                     . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
-                    """
+                    '''
                 }
             }
         }
         
-        stage('Update Pip and Setuptools') {
+        stage('Create Virtual Environment') {
             steps {
                 script {
-                    sh """
+                    sh '''
                     . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
-                    conda run -n base pip install --upgrade pip setuptools
-                    """
+                    conda create -y -n chatbot_env python=3.8
+                    conda activate chatbot_env
+                    '''
                 }
             }
         }
@@ -33,10 +34,12 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh """
+                    sh '''
                     . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
-                    conda run -n base pip install -r requirements.txt
-                    """
+                    conda activate chatbot_env
+                    pip install --upgrade pip setuptools
+                    pip install -r requirements.txt
+                    '''
                 }
             }
         }
@@ -44,10 +47,11 @@ pipeline {
         stage('Train Chatbot Model') {
             steps {
                 script {
-                    sh """
+                    sh '''
                     . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
-                    conda run -n base python train_chatbot_model.py
-                    """
+                    conda activate chatbot_env
+                    python train_chatbot_model.py
+                    '''
                 }
             }
         }
@@ -65,7 +69,7 @@ pipeline {
             steps {
                 script {
                     // Run Docker container
-                    sh "docker run -p 8080:80 chatbot-app &"
+                    sh "docker run -p 8081:80 chatbot-app &"
                 }
             }
         }
@@ -79,8 +83,9 @@ pipeline {
             // Clean up Docker resources
             sh "docker system prune -f"
             
-            // Deactivate Conda environment
+            // Deactivate Conda environment and virtual environment
             sh '. /var/lib/jenkins/workspace/chatbot/miniconda/bin/deactivate'
+            sh 'conda deactivate'
         }
     }
 }
