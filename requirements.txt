@@ -1,5 +1,5 @@
 nltk==3.6.2
-numpy==1.21.2
+numpy
 keras==2.6.0
 Flask==2.1.1
 chatterbot==1.0.5
