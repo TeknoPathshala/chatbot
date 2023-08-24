@@ -43,7 +43,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image
+                    // Build Docker image
                     sh "docker build -t chatbot-app ."
                 }
             }
@@ -52,8 +52,8 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    // Run the Docker container
-                    sh "docker run -p 8080:80 chatbot-app &"
+                    // Run Docker container
+                    sh "docker run -p 8081:80 chatbot-app &"
                 }
             }
         }
