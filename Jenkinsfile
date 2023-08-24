@@ -50,13 +50,4 @@ pipeline {
         }
     }
     
-    post {
-        always {
-            // Stop the chatbot app
-            sh 'pkill -f "python app.py"'
-            
-            // Deactivate virtual environment
-            sh "deactivate"
-        }
-    }
 }
