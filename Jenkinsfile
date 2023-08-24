@@ -11,16 +11,8 @@ pipeline {
         stage('Setup Environment') {
             steps {
                 script {
-                    // Install Miniconda
-                    sh 'wget -O miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh'
-                    sh 'chmod +x miniconda.sh'
-                    sh './miniconda.sh -b -p $WORKSPACE/miniconda'
-   
-                    // Update conda
-                    sh '$WORKSPACE/miniconda/bin/conda update -y -n base conda'
-   
-                    // Create Conda environment
-                    sh '$WORKSPACE/miniconda/bin/conda create -y -n chatbot python=3.8'
+                    // Activate existing Conda environment
+                    sh 'source /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate'
                 }
             }
         }
@@ -28,7 +20,7 @@ pipeline {
         stage('Update Pip and Setuptools') {
             steps {
                 script {
-                    sh '$WORKSPACE/miniconda/bin/conda run -n chatbot pip install --upgrade pip setuptools'
+                    sh '$CONDA_PREFIX/bin/conda run -n base pip install --upgrade pip setuptools'
                 }
             }
         }
@@ -36,7 +28,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh '$WORKSPACE/miniconda/bin/conda run -n chatbot pip install -r requirements.txt'
+                    sh '$CONDA_PREFIX/bin/conda run -n base pip install -r requirements.txt'
                 }
             }
         }
@@ -44,7 +36,7 @@ pipeline {
         stage('Train Chatbot Model') {
             steps {
                 script {
-                    sh '$WORKSPACE/miniconda/bin/conda run -n chatbot python train_chatbot_model.py'
+                    sh '$CONDA_PREFIX/bin/conda run -n base python train_chatbot_model.py'
                 }
             }
         }
@@ -77,7 +69,7 @@ pipeline {
             sh "docker system prune -f"
             
             // Deactivate Conda environment
-            sh '$WORKSPACE/miniconda/bin/conda deactivate'
+            sh 'conda deactivate'
         }
     }
 }
