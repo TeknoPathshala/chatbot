@@ -40,11 +40,20 @@ pipeline {
             }
         }
         
-        stage('Deploy Chatbot App') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    // Activate virtual environment and start the app
-                    sh "source $VIRTUAL_ENV/bin/activate && python app.py &"
+                    // Build the Docker image
+                    sh "docker build -t chatbot-app ."
+                }
+            }
+        }
+        
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    // Run the Docker container
+                    sh "docker run -p 8080:80 chatbot-app &"
                 }
             }
         }
@@ -52,8 +61,11 @@ pipeline {
     
     post {
         always {
-            // Stop the chatbot app
-            sh 'pkill -f "python app.py"'
+            // Stop the Docker container
+            sh "docker ps -aqf \"name=chatbot-app\" | xargs docker stop"
+            
+            // Clean up Docker resources
+            sh "docker system prune -f"
             
             // Deactivate virtual environment
             sh "$VIRTUAL_ENV/bin/deactivate"
