@@ -12,7 +12,9 @@ pipeline {
             steps {
                 script {
                     // Activate existing Conda environment
-                    sh 'source /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate'
+                    sh """
+                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
+                    """
                 }
             }
         }
@@ -20,7 +22,10 @@ pipeline {
         stage('Update Pip and Setuptools') {
             steps {
                 script {
-                    sh '$CONDA_PREFIX/bin/conda run -n base pip install --upgrade pip setuptools'
+                    sh """
+                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
+                    conda run -n base pip install --upgrade pip setuptools
+                    """
                 }
             }
         }
@@ -28,7 +33,10 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh '$CONDA_PREFIX/bin/conda run -n base pip install -r requirements.txt'
+                    sh """
+                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
+                    conda run -n base pip install -r requirements.txt
+                    """
                 }
             }
         }
@@ -36,7 +44,10 @@ pipeline {
         stage('Train Chatbot Model') {
             steps {
                 script {
-                    sh '$CONDA_PREFIX/bin/conda run -n base python train_chatbot_model.py'
+                    sh """
+                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
+                    conda run -n base python train_chatbot_model.py
+                    """
                 }
             }
         }
@@ -69,7 +80,7 @@ pipeline {
             sh "docker system prune -f"
             
             // Deactivate Conda environment
-            sh 'conda deactivate'
+            sh '. /var/lib/jenkins/workspace/chatbot/miniconda/bin/deactivate'
         }
     }
 }
