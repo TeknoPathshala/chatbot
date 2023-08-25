@@ -58,7 +58,7 @@ pipeline {
                 script {
                     sh """
                     . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
-                    conda run -n chatbot_env python -c "import nltk; nltk.download('punkt')"
+                    conda run -n chatbot_env python -c "import nltk; nltk.download('punkt'); nltk.download('wordnet')"
                     """
                 }
             }
