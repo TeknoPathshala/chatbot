@@ -11,7 +11,6 @@ pipeline {
         stage('Setup Environment') {
             steps {
                 script {
-                    // Activate existing Conda environment
                     sh """
                     . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
                     """
@@ -54,6 +53,17 @@ pipeline {
             }
         }
         
+        stage('Download NLTK Data') {
+            steps {
+                script {
+                    sh """
+                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
+                    conda run -n chatbot_env python -c "import nltk; nltk.download('punkt')"
+                    """
+                }
+            }
+        }
+        
         stage('Train Chatbot Model') {
             steps {
                 script {
@@ -69,7 +79,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build Docker image
                     sh "docker build -t chatbot-app ."
                 }
             }
@@ -78,7 +87,6 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    // Run Docker container
                     sh "docker run -p 8080:80 chatbot-app &"
                 }
             }
@@ -87,13 +95,8 @@ pipeline {
     
     post {
         always {
-            // Stop the Docker container
             sh "docker ps -aqf \"name=chatbot-app\" | xargs docker stop"
-            
-            // Clean up Docker resources
             sh "docker system prune -f"
-            
-            // Deactivate Conda environment and virtual environment
             sh '. /var/lib/jenkins/workspace/chatbot/miniconda/bin/deactivate'
             sh 'conda deactivate'
         }
