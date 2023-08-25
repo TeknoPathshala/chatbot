@@ -50,7 +50,7 @@ pickle.dump(classes,open('classes.pkl','wb'))
 # create our training data
 training = []
 # create an empty array for our output
-output_empty = [object()] * len(classes)
+output_empty = np.zeros((len(classes),), dtype=np.int)
 # training set, bag of words for each sentence
 for doc in documents:
     # initialize our bag of words
