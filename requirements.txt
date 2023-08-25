@@ -3,3 +3,4 @@ numpy==1.20.3
 keras==2.6.0
 Flask==2.1.1
 chatterbot==1.0.5
+TensorFlow==2.13.0
