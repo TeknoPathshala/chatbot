@@ -26,7 +26,6 @@ pipeline {
                     . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
                     conda create -y -n chatbot_env python=3.8
                     conda activate chatbot_env
-                    conda install -y tensorflow
                     """
                 }
             }
@@ -49,6 +48,7 @@ pipeline {
                     sh """
                     . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
                     conda run -n chatbot_env pip install -r requirements.txt
+                    pip install tensorflow
                     """
                 }
             }
