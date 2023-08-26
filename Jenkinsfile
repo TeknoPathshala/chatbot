@@ -11,9 +11,8 @@ pipeline {
                 script {
                     sh """
                     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-                    rm -rf /var/lib/jenkins/miniconda  # Remove existing directory if exists
-                    bash miniconda.sh -b -p /var/lib/jenkins/miniconda
-                    export CONDA_PREFIX=/var/lib/jenkins/miniconda
+                    bash miniconda.sh -b -p ${HOME}/miniconda
+                    conda init bash
                     """
                 }
             }
@@ -24,7 +23,7 @@ pipeline {
                 script {
                     sh """
                     conda create -y -n chatbot_env python=3.8
-                    source activate chatbot_env  # Use 'source' command to activate the environment
+                    . activate chatbot_env  # Use '.' command to activate the environment
                     """
                 }
             }
