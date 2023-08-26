@@ -24,7 +24,7 @@ pipeline {
                 script {
                     sh """
                     conda create -y -n chatbot_env python=3.8
-                    conda activate chatbot_env
+                    source activate chatbot_env  # Use 'source' command to activate the environment
                     """
                 }
             }
