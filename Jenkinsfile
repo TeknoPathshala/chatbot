@@ -41,6 +41,7 @@ pipeline {
                     sh "conda run -n chatbot_env pip install -r requirements.txt"
                     sh "conda run -n chatbot_env pip install tensorflow"
                     sh "conda run -n chatbot_env python -m nltk.downloader punkt"  // Download NLTK resources
+                    sh "conda run -n chatbot_env python -m nltk.downloader wordnet" // Download NLTK resources
                 }
             }
         }
