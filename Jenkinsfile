@@ -24,6 +24,7 @@ pipeline {
                 script {
                     sh """
                     conda create -y -n chatbot_env python=3.8
+                    conda activate chatbot_env
                     """
                 }
             }
@@ -44,7 +45,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    /var/lib/jenkins/miniconda/envs/chatbot_env/bin/python train_chatbot_model.py
+                    python train_chatbot_model.py
                     """
                 }
             }
@@ -82,6 +83,7 @@ pipeline {
                 }
 
                 sh "docker system prune -f"
+                sh 'conda deactivate'
             }
         }
     }
