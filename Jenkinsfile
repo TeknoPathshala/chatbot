@@ -24,35 +24,13 @@ pipeline {
                 script {
                     sh """
                     conda create -y -n chatbot_env python=3.8
+                    conda activate chatbot_env
                     """
                 }
             }
         }
         
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-        
-        stage('Activate Conda Environment') {
-            steps {
-                script {
-                    sh "conda run -n chatbot_env pip install -r requirements.txt"
-                    sh "conda run -n chatbot_env pip install tensorflow"
-                    sh "conda run -n chatbot_env python -m nltk.downloader punkt"  // Download NLTK resources
-                    sh "conda run -n chatbot_env python -m nltk.downloader wordnet" // Download NLTK resources
-                }
-            }
-        }
-        
-        stage('Train Chatbot Model') {
-            steps {
-                script {
-                    sh "conda run -n chatbot_env python train_chatbot_model.py"
-                }
-            }
-        }
+        // Add other stages as needed
         
         stage('Build Docker Image') {
             steps {
@@ -65,7 +43,7 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    sh "docker run -p 8080:80 chatbot-app &"
+                    sh "docker run -p 8080:80 --name chatbot-container chatbot-app &"
                 }
             }
         }
@@ -73,9 +51,19 @@ pipeline {
     
     post {
         always {
-            sh "docker ps -aqf \"name=chatbot-app\" | xargs docker stop"
-            sh "docker system prune -f"
-            sh "conda deactivate"
+            script {
+                def containerId = sh(
+                    script: "docker ps -aqf 'name=chatbot-container'",
+                    returnStdout: true
+                ).trim()
+
+                if (containerId) {
+                    sh "docker stop ${containerId}"
+                }
+
+                sh "docker system prune -f"
+                sh "conda deactivate"
+            }
         }
     }
 }
