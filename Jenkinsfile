@@ -24,7 +24,7 @@ pipeline {
                 script {
                     sh """
                     conda create -y -n chatbot_env python=3.8
-                    conda activate chatbot_env
+                    ${HOME}/miniconda/envs/chatbot_env/bin/activate
                     """
                 }
             }
@@ -74,7 +74,7 @@ pipeline {
         always {
             sh "docker ps -aqf \"name=chatbot-app\" | xargs docker stop"
             sh "docker system prune -f"
-            sh 'conda deactivate'
+            sh "${HOME}/miniconda/bin/deactivate"
         }
     }
 }
