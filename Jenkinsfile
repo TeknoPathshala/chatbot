@@ -19,39 +19,20 @@ pipeline {
             }
         }
         
-        stage('Create and Activate Conda Environment') {
+        stage('Install Dependencies and Run Tasks') {
             steps {
                 script {
                     sh """
                     conda create -y -n chatbot_env python=3.8
-                    conda activate chatbot_env
-                    """
-                }
-            }
-        }
-        
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    sh """
+                    source activate chatbot_env
                     pip install -r requirements.txt
                     pip install tensorflow
-                    """
-                }
-            }
-        }
-        
-        stage('Train Chatbot Model') {
-            steps {
-                script {
-                    sh """
                     python train_chatbot_model.py
+                    source deactivate
                     """
                 }
             }
         }
-        
-        // Add other stages as needed
         
         stage('Build Docker Image') {
             steps {
@@ -83,7 +64,6 @@ pipeline {
                 }
 
                 sh "docker system prune -f"
-                sh 'conda deactivate'
             }
         }
     }
