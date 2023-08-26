@@ -33,7 +33,6 @@ pipeline {
             steps {
                 script {
                     sh """
-                    conda activate chatbot_env
                     pip install -r requirements.txt
                     pip install tensorflow
                     """
@@ -45,8 +44,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    conda activate chatbot_env
-                    python train_chatbot_model.py
+                    /var/lib/jenkins/miniconda/envs/chatbot_env/bin/python train_chatbot_model.py
                     """
                 }
             }
