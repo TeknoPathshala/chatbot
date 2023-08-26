@@ -24,7 +24,6 @@ pipeline {
                 script {
                     sh """
                     conda create -y -n chatbot_env python=3.8
-                    ${HOME}/miniconda/envs/chatbot_env/bin/activate
                     """
                 }
             }
@@ -36,11 +35,11 @@ pipeline {
             }
         }
         
-        stage('Install Dependencies') {
+        stage('Activate Conda Environment') {
             steps {
                 script {
-                    sh "pip install -r requirements.txt"
-                    sh "pip install tensorflow"
+                    sh "conda run -n chatbot_env pip install -r requirements.txt"
+                    sh "conda run -n chatbot_env pip install tensorflow"
                 }
             }
         }
@@ -48,7 +47,7 @@ pipeline {
         stage('Train Chatbot Model') {
             steps {
                 script {
-                    sh "python train_chatbot_model.py"
+                    sh "conda run -n chatbot_env python train_chatbot_model.py"
                 }
             }
         }
@@ -74,7 +73,7 @@ pipeline {
         always {
             sh "docker ps -aqf \"name=chatbot-app\" | xargs docker stop"
             sh "docker system prune -f"
-            sh "${HOME}/miniconda/bin/deactivate"
+            sh "conda deactivate"
         }
     }
 }
