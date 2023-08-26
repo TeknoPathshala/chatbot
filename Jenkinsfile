@@ -10,6 +10,7 @@ pipeline {
             steps {
                 script {
                     sh """
+                    rm -rf /var/lib/jenkins/miniconda  # Delete existing installation
                     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
                     bash miniconda.sh -b -p ${HOME}/miniconda
                     conda init bash
@@ -23,7 +24,7 @@ pipeline {
                 script {
                     sh """
                     conda create -y -n chatbot_env python=3.8
-                    . activate chatbot_env  # Use '.' command to activate the environment
+                    conda activate chatbot_env
                     """
                 }
             }
