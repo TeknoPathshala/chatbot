@@ -2,27 +2,24 @@ pipeline {
     agent any
     
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-        
-        stage('Setup Environment') {
+        stage('Setup Miniconda') {
             steps {
                 script {
                     sh """
-                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
+                    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+                    bash miniconda.sh -b -p $HOME/miniconda
+                    export PATH="$HOME/miniconda/bin:$PATH"
+                    conda init bash
+                    source ~/.bashrc
                     """
                 }
             }
         }
         
-        stage('Create Virtual Environment') {
+        stage('Create and Activate Conda Environment') {
             steps {
                 script {
                     sh """
-                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
                     conda create -y -n chatbot_env python=3.8
                     conda activate chatbot_env
                     """
@@ -30,14 +27,9 @@ pipeline {
             }
         }
         
-        stage('Update Pip and Setuptools') {
+        stage('Checkout') {
             steps {
-                script {
-                    sh """
-                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
-                    conda run -n chatbot_env pip install --upgrade pip setuptools
-                    """
-                }
+                checkout scm
             }
         }
         
@@ -45,8 +37,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
-                    conda run -n chatbot_env pip install -r requirements.txt
+                    pip install -r requirements.txt
                     pip install tensorflow
                     """
                 }
@@ -57,8 +48,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
-                    conda run -n chatbot_env python -c "import nltk; nltk.download('punkt'); nltk.download('wordnet')"
+                    python -c "import nltk; nltk.download('punkt'); nltk.download('wordnet')"
                     """
                 }
             }
@@ -68,8 +58,6 @@ pipeline {
             steps {
                 script {
                     sh """
-                    . /var/lib/jenkins/workspace/chatbot/miniconda/bin/activate
-                    conda activate chatbot_env
                     python train_chatbot_model.py
                     """
                 }
@@ -97,7 +85,6 @@ pipeline {
         always {
             sh "docker ps -aqf \"name=chatbot-app\" | xargs docker stop"
             sh "docker system prune -f"
-            sh '. /var/lib/jenkins/workspace/chatbot/miniconda/bin/deactivate'
             sh 'conda deactivate'
         }
     }
