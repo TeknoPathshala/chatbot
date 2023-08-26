@@ -1,16 +1,18 @@
 pipeline {
     agent any
     
+    environment {
+        PATH = "${HOME}/miniconda/bin:${PATH}"
+    }
+    
     stages {
         stage('Setup Miniconda') {
             steps {
                 script {
                     sh """
                     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-                    bash miniconda.sh -b -p $HOME/miniconda
-                    export PATH="$HOME/miniconda/bin:$PATH"
+                    bash miniconda.sh -b -p ${HOME}/miniconda
                     conda init bash
-                    source ~/.bashrc
                     """
                 }
             }
@@ -36,20 +38,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh """
-                    pip install -r requirements.txt
-                    pip install tensorflow
-                    """
-                }
-            }
-        }
-        
-        stage('Download NLTK Data') {
-            steps {
-                script {
-                    sh """
-                    python -c "import nltk; nltk.download('punkt'); nltk.download('wordnet')"
-                    """
+                    sh "pip install -r requirements.txt"
+                    sh "pip install tensorflow"
                 }
             }
         }
@@ -57,9 +47,7 @@ pipeline {
         stage('Train Chatbot Model') {
             steps {
                 script {
-                    sh """
-                    python train_chatbot_model.py
-                    """
+                    sh "python train_chatbot_model.py"
                 }
             }
         }
